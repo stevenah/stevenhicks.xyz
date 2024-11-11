@@ -2,175 +2,35 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="keywords" content="resume, research, projects" />
-  <meta name="description"
-    content="The personal website for Steven Hicks, a developer and research based in Oslo, Norway.">
-  <link rel="apple-touch-icon" sizes="180x180" href="/public/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png" />
-  <link rel="manifest" href="/public/site.webmanifest" />
-  <link rel="stylesheet" type="text/css" href="./style.css" />
-  <title>Steven Hicks</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="resume, research, projects" />
+    <meta name="description"
+        content="The personal website for Steven Hicks, a developer and research based in Oslo, Norway.">
+    <link rel="apple-touch-icon" sizes="180x180" href="/public/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png" />
+    <link rel="manifest" href="/public/site.webmanifest" />
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+    <title>Steven Hicks</title>
 </head>
 
 <body>
-  <header>
-    <nav>
-      <ul>
-        <li><a href="/">Steven Hicks</a></li>
-        <li><a href="/research">Research</a></li>
-        <li><a href="/projects">Projects</a></li>
-      </ul>
-      <div id="theme-toggle">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-          class="theme-toggle-icon">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-        </svg>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-          class="theme-toggle-icon">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-        </svg>
-      </div>
-    </nav>
-  </header>
-  <div class="container">
-    <div class="banner">
-      <img src="/public/photo.jpg">
-      <h1>Steven Hicks</h1>
-    </div>
-    <article class="content">
-      <!-- <section id="websites">
-        <h2>Websites</h2>
-        <div class="projects-grid">
-          <div>
-            <img src="/public/stevenhicks.xyz.png" />
-            <div>
-              <h3><a href="https://stevenhicks.xyz" target="_blank">stevenhicks.xyz</a></h3>
-              <div>
-                My personal website made with no libraries or frameworks.
-              </div>
-            </div>
-          </div>
-          <div>
-            <img src="/public/datasets.simula.no.png" />
-            <div>
-              <h3><a href="https://datasets.simula.no" target="_blank">datasets.simula.no</a></h3>
-              <div>
-                I developed Simula's dataset website containig several open datasets.
-              </div>
-            </div>
-          </div>
+    <!-- components/header.html -->
+    <div class="container">
+        <div class="banner">
+            <img src="/public/photo.jpg">
+            <h1>Steven Hicks</h1>
         </div>
-      </section> -->
-      <section id="projects">
-        <h2>Projects</h2>
-        <table>
-          <tr>
-            <td>
-              <span><a target="_blank" href="https://www.asge.org">ASGE</a></span><br />
-              <span>EndoNet</span><br />
-              <span>2023</span>
-            </td>
-            <td> Developed a robust system for the acquisition and annotation of colonoscopy data from multiple
-              healthcare centers across the United States. The platform aims to establish a comprehensive dataset to
-              serve as a benchmark for future AI solutions in the field of gastrointestinal care.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span><a target="_blank" href="https://www.svenskelitfotboll.se/">Unibet and SEF</a></span><br />
-              <span>Match-Fixing</span><br />
-              <span>2023</span>
-            </td>
-            <td> Collaborated with SEF and Unibet in the design and implementation of a web-based application geared
-              towards detecting match-fixing in soccer. The software features intricate statistics and data
-              visualization modules to identify potential fraudulent activities.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span><a target="_blank" href="fhi.no">FHI</a></span><br />
-              <span>Smittestopp</span><br />
-              <span>2020</span>
-            </td>
-            <td>Contributed to the first version of the Smittestopp application as a member of the data science team.
-              Responsibilities included visualizing user trajectories, validating contact events, and devising
-              algorithms for the classification of different modes of transport.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span><a target="_blank" href="https://augere.md">Augere</a></span><br />
-              <span>GI Image Analysis</span><br />
-              <span>2019</span>
-            </td>
-            <td>Partnered with Augere AS in creating datasets and AI models for the detection of gastrointestinal
-              diseases.
-              Implemented models in Python using TensorFlow and PyTorch, enhancing diagnostic accuracy and efficiency.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span><a target="_blank" href="https://spillfree.no/">Spillfree Analytics</a></span><br />
-              <span>Fish Analytics</span><br />
-              <span>2018</span>
-            </td>
-            <td>Designed and implemented algorithms for fish detection
-              and classification with the objective of automating feeding procedures in aquaculture. The algorithms were
-              developed in Python using TensorFlow and PyTorch.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span><a target="_blank" href="https://www.rodekors.no/en/about-us/cbs-and-nyss/">Red Cross</a></span><br />
-              <span>Nyss</span><br />
-              <span>2018</span>
-            </td>
-            <td>Contributed to the initial developmen of Nyss, Red Cross' disease surveillance system. The system
-              features a web-based application for the visualization of disease outbreaks and a mobile application for
-              the collection of data in the field. The application was developed using a React and Redux stack.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span><a target="_blank" href="https://www.dnb.no">DNB</a></span><br />
-              <span>Subscription App</span><br />
-              <span>2017</span>
-            </td>
-            <td>Created a financial analytics application that scrutinizes nettbank transactions to provide users with
-              an organized overview of daily, weekly, and yearly recurring expenses. The app also includes social
-              features to share subscriptions with friends via Facebook. The app was developed using a React and Redux
-              stack. There was no back-end, only DNB's internal APIs.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span><a target="_blank" href="https://dhis2.org">DHIS2</a></span><br />
-              <span>DHIS2 Data Store</span><br />
-              <span>2016</span>
-            </td>
-            <td> Developed a web application to manage data storage within the DHIS2 ecosystem at the University of
-              Oslo. The application was subsequently integrated into the official DHIS2 platform, leading to part-time
-              employment.
-            </td>
-          </tr>
-        </table>
-      </section>
-    </article>
-  </div>
-  <footer>
-    <span>
-      © 2023 Steven Hicks. All Rights Reserved.
-    </span>
-  </footer>
-  <script src="script.js"></script>
-  <script async defer src="https://nocookieanalytics.com/latest.js"></script>
+        <article class="content">
+            <!-- sections/projects.html -->
+        </article>
+    </div>
+    <!-- components/footer.html -->
+    <script src="script.js"></script>
+    <script async defer src="https://nocookieanalytics.com/latest.js"></script>
 </body>
 
 </html>
