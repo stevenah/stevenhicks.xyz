@@ -14,8 +14,6 @@ jobs:
           node-version: 18
 
       - run: make all
-      
-      - run: npx minify dist/index.html > dist/index.html
 
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
