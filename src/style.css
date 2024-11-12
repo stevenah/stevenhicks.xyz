@@ -241,7 +241,7 @@ ol {
 .decorated {
 	overflow: hidden;
 	text-align: center;
-    margin-bottom:10px;
+	margin-bottom: 10px;
 }
 .decorated > span {
 	position: relative;
@@ -261,4 +261,18 @@ ol {
 }
 .decorated > span:after {
 	left: 100%;
+}
+
+.item-entry {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+    margin-bottom: 4px;
+}
+
+.item-entry-header {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
 }
