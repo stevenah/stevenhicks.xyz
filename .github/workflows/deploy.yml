@@ -13,33 +13,9 @@ jobs:
         with:
           node-version: 18
 
-      - run: >-
-          for page in `ls ./src/*.html`;
-          do 
-            sed -i "s|<link rel=\"stylesheet\" type=\"text/css\" href=\"./style.css\" />|<style>$(<./src/style.css sed -e 's/&/\\&/g' -e 's/\//\\\//g' | tr -d '\n')</style>|g" $page;
-          done
-
-      - run: >-
-          for page in `ls ./src/*.html`;
-          do 
-            sed -i "s|<script src=\"script.js\"></script>|<script>$(<./src/script.js sed -e 's/&/\\&/g' -e 's/\//\\\//g' | tr -d '\n')</script>|g" $page;
-          done
-
-      - run: pip3 install pybtex
-      - run: python3 ./tools/generate_bibliography.py
-      - run: sed -i "s/<\!-- bibliography -->/$(<bibliography.html sed -e 's/&/\\&/g' -e 's/\//\\\//g' | tr -d '\n')/g" ./src/research.html
-      - run: sed -i "s/<\!-- masterstudents -->/$(<master.html sed -e 's/&/\\&/g' -e 's/\//\\\//g' | tr -d '\n')/g" ./src/research.html
-
-      - run: mkdir dist
+      - run: make all
       
-      - run: npx minify src/index.html > dist/index.html
-      - run: npx minify src/research.html > dist/research.html
-      - run: npx minify src/projects.html > dist/projects.html
-
-      - run: cp resume.pdf dist/
-      - run: cp robots.txt dist/
-      - run: cp -r public dist/
-      - run: cp -r bibtex dist/
+      - run: npx minify dist/index.html > dist/index.html
 
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
