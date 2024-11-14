@@ -170,6 +170,24 @@ body.light-mode #theme-toggle > svg:first-child {
 	display: none;
 }
 
+.socials {
+    margin: 10px 0 0px 0;
+}
+
+.socials > ul {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.socials > ul > li {
+	margin: 0px 0px 0px 10px;
+}
+
+.socials > ul > li:first-child {
+	margin-left: 0;
+}
+
 .banner {
 	padding-top: 50px;
 	padding-bottom: 10px;
