@@ -84,6 +84,11 @@ article.resume {
     flex-direction: column;
     gap: 20px;
 }
+
+article.resume a {
+    font-weight: bold;
+}
+
 article.resume > section > h2 {
 	overflow: hidden;
 	text-align: center;
