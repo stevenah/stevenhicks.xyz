@@ -18,6 +18,15 @@
     <script>
         if (new Date().getMonth() === 11) {
             document.documentElement.classList.add('december');
+            document.addEventListener('DOMContentLoaded', function() {
+                var fastLayer = document.createElement('div');
+                fastLayer.className = 'snow-layer snow-layer--fast';
+                document.body.appendChild(fastLayer);
+
+                var slowLayer = document.createElement('div');
+                slowLayer.className = 'snow-layer snow-layer--slow';
+                document.body.appendChild(slowLayer);
+            });
         }
     </script>
 </head>
