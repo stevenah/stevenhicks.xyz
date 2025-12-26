@@ -20,6 +20,72 @@ body {
 	background-color: var(--background-color);
 	padding: 40px 20px 20px 20px;
 	margin: 0px auto;
+	position: relative;
+}
+
+html.december body {
+	background-color: transparent;
+}
+
+html.december {
+	background-color: var(--background-color);
+}
+
+/* Falling Snow (December only) */
+html.december body::before,
+html.december body::after {
+	content: "";
+	position: fixed;
+	top: -100%;
+	left: 0;
+	width: 100%;
+	height: 200%;
+	pointer-events: none;
+	z-index: -1;
+	background-image: radial-gradient(2px 2px at 100px 50px, white 50%, transparent),
+		radial-gradient(2px 2px at 200px 150px, white 50%, transparent),
+		radial-gradient(1.5px 1.5px at 300px 250px, rgba(255,255,255,0.8) 50%, transparent),
+		radial-gradient(2px 2px at 400px 100px, white 50%, transparent),
+		radial-gradient(1.5px 1.5px at 500px 300px, rgba(255,255,255,0.8) 50%, transparent),
+		radial-gradient(2px 2px at 50px 200px, white 50%, transparent),
+		radial-gradient(1.5px 1.5px at 150px 350px, rgba(255,255,255,0.7) 50%, transparent),
+		radial-gradient(2px 2px at 250px 400px, white 50%, transparent),
+		radial-gradient(1.5px 1.5px at 350px 50px, rgba(255,255,255,0.8) 50%, transparent),
+		radial-gradient(2px 2px at 450px 200px, white 50%, transparent);
+	background-size: 500px 500px;
+	animation: snowfall 8s linear infinite;
+}
+
+html.december body::after {
+	background-image: radial-gradient(1.5px 1.5px at 75px 125px, rgba(255,255,255,0.6) 50%, transparent),
+		radial-gradient(1.5px 1.5px at 175px 275px, rgba(255,255,255,0.5) 50%, transparent),
+		radial-gradient(1px 1px at 275px 75px, rgba(255,255,255,0.6) 50%, transparent),
+		radial-gradient(1.5px 1.5px at 375px 225px, rgba(255,255,255,0.5) 50%, transparent),
+		radial-gradient(1px 1px at 475px 375px, rgba(255,255,255,0.6) 50%, transparent),
+		radial-gradient(1.5px 1.5px at 25px 325px, rgba(255,255,255,0.5) 50%, transparent),
+		radial-gradient(1px 1px at 125px 175px, rgba(255,255,255,0.6) 50%, transparent),
+		radial-gradient(1.5px 1.5px at 225px 25px, rgba(255,255,255,0.5) 50%, transparent);
+	background-size: 500px 500px;
+	animation: snowfall 12s linear infinite;
+	animation-delay: -4s;
+}
+
+@keyframes snowfall {
+	0% {
+		transform: translateY(0) translateX(0);
+	}
+	25% {
+		transform: translateY(12.5%) translateX(15px);
+	}
+	50% {
+		transform: translateY(25%) translateX(0);
+	}
+	75% {
+		transform: translateY(37.5%) translateX(-15px);
+	}
+	100% {
+		transform: translateY(50%) translateX(0);
+	}
 }
 
 p,
@@ -51,6 +117,14 @@ header {
 	flex-direction: column;
 	align-items: center;
 }
+
+/* December content background */
+/* html.december header,
+html.december article.resume {
+	background-color: var(--background-color);
+	padding: 20px;
+	border-radius: 8px; */
+/* } */
 
 header > img {
 	height: 175px;
