@@ -31,6 +31,9 @@ html.december {
 	background-color: #0a0a14;
 	min-height: 100%;
 	min-height: 100dvh;
+	overflow-x: hidden;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
 html.halloween body {

@@ -40,7 +40,7 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const canvas = document.createElement('canvas');
                 canvas.id = 'effect-canvas';
-                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;height:100dvh;pointer-events:auto;z-index:-1;';
+                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;height:100dvh;pointer-events:none;z-index:-1;touch-action:none;';
                 document.body.appendChild(canvas);
 
                 const ctx = canvas.getContext('2d');
@@ -69,6 +69,19 @@
                 resizeCanvas();
 
                 if (isNewYear) {
+                    // ==========================================
+                    // FEATURE TOGGLES - Enable/disable effects
+                    // ==========================================
+                    const FEATURES = {
+                        stars: true,           // Twinkling background stars
+                        shootingStars: false,   // Occasional shooting stars
+                        city: true,            // City skyline with lit windows
+                        water: true,           // Water reflection below city
+                        fireworks: true,       // Firework rockets and explosions
+                        clickExplosions: true, // Click to create explosions
+                        buildingSpacing: 5,    // Space between buildings
+                    };
+
                     // Fireworks for New Year's Eve and Day
                     const CONFIG = {
                         // Physics
@@ -125,6 +138,7 @@
 
                     function generateStars() {
                         stars = [];
+                        if (!FEATURES.stars) return;
                         for (let i = 0; i < STAR_COUNT; i++) {
                             stars.push({
                                 x: Math.random() * width,
@@ -174,6 +188,11 @@
                     let cityPath = null;
                     let buildings = [];
                     function generateCity() {
+                        if (!FEATURES.city) {
+                            cityPath = null;
+                            buildings = [];
+                            return;
+                        }
                         cityPath = new Path2D();
                         buildings = [];
                         const baseY = height * 0.75;
@@ -231,7 +250,7 @@
                             // Building right side
                             cityPath.lineTo(x + buildingWidth, baseY);
 
-                            x += buildingWidth + Math.random() * 5;
+                            x += buildingWidth + FEATURES.buildingSpacing;
                         }
 
                         cityPath.lineTo(width, baseY);
@@ -374,11 +393,39 @@
                         }
                     }
 
-                    // Click to create explosion at cursor position
-                    canvas.addEventListener('click', function (e) {
-                        const rect = canvas.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
+                    // Click/tap to create explosion at cursor position
+                    // Use document-level listener since canvas has pointer-events:none for scroll
+                    let touchStartY = 0;
+                    let touchStartTime = 0;
+
+                    document.addEventListener('touchstart', function(e) {
+                        touchStartY = e.touches[0].clientY;
+                        touchStartTime = Date.now();
+                    }, { passive: true });
+
+                    document.addEventListener('touchend', function(e) {
+                        if (!FEATURES.clickExplosions) return;
+                        // Only trigger explosion if it was a tap (not a scroll)
+                        const touchEndY = e.changedTouches[0].clientY;
+                        const touchDuration = Date.now() - touchStartTime;
+                        const touchDistance = Math.abs(touchEndY - touchStartY);
+
+                        // If touch was quick (<300ms) and didn't move much (<10px), treat as tap
+                        if (touchDuration < 300 && touchDistance < 10) {
+                            const x = e.changedTouches[0].clientX;
+                            const y = e.changedTouches[0].clientY;
+                            const colorSet = colors[Math.floor(Math.random() * colors.length)];
+                            explode({ x, y, vx: 0, vy: 0, colorSet });
+                        }
+                    }, { passive: true });
+
+                    // Desktop click handler
+                    document.addEventListener('click', function (e) {
+                        if (!FEATURES.clickExplosions) return;
+                        // Ignore if it's a touch device (handled by touchend)
+                        if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
+                        const x = e.clientX;
+                        const y = e.clientY;
                         const colorSet = colors[Math.floor(Math.random() * colors.length)];
                         explode({ x, y, vx: 0, vy: 0, colorSet });
                     });
@@ -454,27 +501,28 @@
                         }
 
                         // Update shooting stars
-                        // if (Math.random() < SHOOTING_STAR_CONFIG.spawnChance &&
-                        //     shootingStars.length < SHOOTING_STAR_CONFIG.maxActive) {
-                        //     shootingStars.push(createShootingStar());
-                        // }
+                        if (FEATURES.shootingStars &&
+                            Math.random() < SHOOTING_STAR_CONFIG.spawnChance &&
+                            shootingStars.length < SHOOTING_STAR_CONFIG.maxActive) {
+                            shootingStars.push(createShootingStar());
+                        }
 
-                        // for (let i = shootingStars.length - 1; i >= 0; i--) {
-                        //     const ss = shootingStars[i];
-                        //     ss.trail.unshift({ x: ss.x, y: ss.y });
-                        //     if (ss.trail.length > 20) ss.trail.pop();
+                        for (let i = shootingStars.length - 1; i >= 0; i--) {
+                            const ss = shootingStars[i];
+                            ss.trail.unshift({ x: ss.x, y: ss.y });
+                            if (ss.trail.length > 20) ss.trail.pop();
 
-                        //     ss.x += ss.vx * dt;
-                        //     ss.y += ss.vy * dt;
-                        //     ss.life -= 0.008 * dt;
+                            ss.x += ss.vx * dt;
+                            ss.y += ss.vy * dt;
+                            ss.life -= 0.008 * dt;
 
-                        //     // Remove if off screen or faded
-                        //     if (ss.x < -50 || ss.x > width + 50 ||
-                        //         ss.y < -50 || ss.y > height * 0.6 ||
-                        //         ss.life <= 0) {
-                        //         shootingStars.splice(i, 1);
-                        //     }
-                        // }
+                            // Remove if off screen or faded
+                            if (ss.x < -50 || ss.x > width + 50 ||
+                                ss.y < -50 || ss.y > height * 0.6 ||
+                                ss.life <= 0) {
+                                shootingStars.splice(i, 1);
+                            }
+                        }
                     }
 
                     function draw() {
@@ -499,42 +547,42 @@
                         }
 
                         // Draw shooting stars
-                        // for (const ss of shootingStars) {
-                        //     if (ss.trail.length < 2) continue;
+                        for (const ss of shootingStars) {
+                            if (ss.trail.length < 2) continue;
 
-                        //     // Draw the glowing trail
-                        //     const gradient = ctx.createLinearGradient(
-                        //         ss.x, ss.y,
-                        //         ss.trail[ss.trail.length - 1].x,
-                        //         ss.trail[ss.trail.length - 1].y
-                        //     );
-                        //     gradient.addColorStop(0, `rgba(255, 255, 255, ${ss.opacity * ss.life})`);
-                        //     gradient.addColorStop(0.3, `rgba(200, 220, 255, ${ss.opacity * ss.life * 0.6})`);
-                        //     gradient.addColorStop(1, 'rgba(150, 180, 255, 0)');
+                            // Draw the glowing trail
+                            const gradient = ctx.createLinearGradient(
+                                ss.x, ss.y,
+                                ss.trail[ss.trail.length - 1].x,
+                                ss.trail[ss.trail.length - 1].y
+                            );
+                            gradient.addColorStop(0, `rgba(255, 255, 255, ${ss.opacity * ss.life})`);
+                            gradient.addColorStop(0.3, `rgba(200, 220, 255, ${ss.opacity * ss.life * 0.6})`);
+                            gradient.addColorStop(1, 'rgba(150, 180, 255, 0)');
 
-                        //     ctx.beginPath();
-                        //     ctx.moveTo(ss.x, ss.y);
-                        //     for (let i = 0; i < ss.trail.length; i++) {
-                        //         const t = ss.trail[i];
-                        //         ctx.lineTo(t.x, t.y);
-                        //     }
-                        //     ctx.strokeStyle = gradient;
-                        //     ctx.lineWidth = 2;
-                        //     ctx.lineCap = 'round';
-                        //     ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(ss.x, ss.y);
+                            for (let i = 0; i < ss.trail.length; i++) {
+                                const t = ss.trail[i];
+                                ctx.lineTo(t.x, t.y);
+                            }
+                            ctx.strokeStyle = gradient;
+                            ctx.lineWidth = 2;
+                            ctx.lineCap = 'round';
+                            ctx.stroke();
 
-                        //     // Draw bright head
-                        //     ctx.beginPath();
-                        //     ctx.arc(ss.x, ss.y, 2, 0, Math.PI * 2);
-                        //     ctx.fillStyle = `rgba(255, 255, 255, ${ss.opacity * ss.life})`;
-                        //     ctx.fill();
+                            // Draw bright head
+                            ctx.beginPath();
+                            ctx.arc(ss.x, ss.y, 2, 0, Math.PI * 2);
+                            ctx.fillStyle = `rgba(255, 255, 255, ${ss.opacity * ss.life})`;
+                            ctx.fill();
 
-                        //     // Glow effect around head
-                        //     ctx.beginPath();
-                        //     ctx.arc(ss.x, ss.y, 4, 0, Math.PI * 2);
-                        //     ctx.fillStyle = `rgba(200, 220, 255, ${ss.opacity * ss.life * 0.3})`;
-                        //     ctx.fill();
-                        // }
+                            // Glow effect around head
+                            ctx.beginPath();
+                            ctx.arc(ss.x, ss.y, 4, 0, Math.PI * 2);
+                            ctx.fillStyle = `rgba(200, 220, 255, ${ss.opacity * ss.life * 0.3})`;
+                            ctx.fill();
+                        }
 
                         // Draw city silhouette
                         if (cityPath) {
@@ -560,30 +608,32 @@
                             }
 
                             // Draw water
-                            const waterGradient = ctx.createLinearGradient(0, waterY, 0, height);
-                            waterGradient.addColorStop(0, '#0a1520');
-                            waterGradient.addColorStop(0.3, '#0d1a28');
-                            waterGradient.addColorStop(1, '#061018');
-                            ctx.fillStyle = waterGradient;
-                            ctx.fillRect(0, waterY, width, height - waterY);
+                            if (FEATURES.water) {
+                                const waterGradient = ctx.createLinearGradient(0, waterY, 0, height);
+                                waterGradient.addColorStop(0, '#0a1520');
+                                waterGradient.addColorStop(0.3, '#0d1a28');
+                                waterGradient.addColorStop(1, '#061018');
+                                ctx.fillStyle = waterGradient;
+                                ctx.fillRect(0, waterY, width, height - waterY);
 
-                            // Draw building reflections in water
-                            ctx.save();
-                            ctx.translate(0, waterY * 2);
-                            ctx.scale(1, -1);
-                            ctx.globalAlpha = 0.3;
-                            ctx.fillStyle = '#0a0a10';
-                            ctx.fill(cityPath);
+                                // Draw building reflections in water
+                                ctx.save();
+                                ctx.translate(0, waterY * 2);
+                                ctx.scale(1, -1);
+                                ctx.globalAlpha = 0.3;
+                                ctx.fillStyle = '#0a0a10';
+                                ctx.fill(cityPath);
 
-                            // Reflected windows (dimmer)
-                            ctx.globalAlpha = 0.15;
-                            for (const b of buildings) {
-                                for (const w of b.windows) {
-                                    ctx.fillStyle = w.color;
-                                    ctx.fillRect(w.x, w.y, w.w, w.h);
+                                // Reflected windows (dimmer)
+                                ctx.globalAlpha = 0.15;
+                                for (const b of buildings) {
+                                    for (const w of b.windows) {
+                                        ctx.fillStyle = w.color;
+                                        ctx.fillRect(w.x, w.y, w.w, w.h);
+                                    }
                                 }
+                                ctx.restore();
                             }
-                            ctx.restore();
                         }
 
                         // Draw firework trails
