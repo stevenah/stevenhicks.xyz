@@ -40,11 +40,7 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const canvas = document.createElement('canvas');
                 canvas.id = 'effect-canvas';
-                canvas.style.position = 'fixed';
-                canvas.style.top = '0';
-                canvas.style.left = '0';
-                canvas.style.pointerEvents = 'auto';
-                canvas.style.zIndex = '-1';
+                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;height:100dvh;pointer-events:auto;z-index:-1;';
                 document.body.appendChild(canvas);
 
                 const ctx = canvas.getContext('2d');
@@ -54,7 +50,10 @@
 
                 function resizeCanvas() {
                     width = window.innerWidth;
-                    height = window.innerHeight;
+                    // Use the larger of innerHeight and documentElement.clientHeight to cover mobile viewports
+                    // Also account for dvh where supported by using a CSS custom property
+                    const dvhHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                    height = Math.max(window.innerHeight, dvhHeight, document.documentElement.clientHeight);
                     canvas.width = width * DPR;
                     canvas.height = height * DPR;
                     canvas.style.width = width + 'px';
@@ -63,6 +62,10 @@
                 }
 
                 window.addEventListener('resize', resizeCanvas);
+                // Handle mobile viewport changes (address bar show/hide)
+                if (window.visualViewport) {
+                    window.visualViewport.addEventListener('resize', resizeCanvas);
+                }
                 resizeCanvas();
 
                 if (isNewYear) {
@@ -134,6 +137,38 @@
                         }
                     }
                     generateStars();
+
+                    // Shooting stars
+                    let shootingStars = [];
+                    const SHOOTING_STAR_CONFIG = {
+                        spawnChance: 0.003,      // Chance per frame to spawn
+                        maxActive: 3,            // Max simultaneous shooting stars
+                        speed: [8, 15],          // Speed range
+                        length: [80, 150],       // Trail length range
+                        startY: [0.05, 0.35],    // Vertical start range (top portion of sky)
+                    };
+
+                    function createShootingStar() {
+                        const startFromLeft = Math.random() > 0.3; // 70% from left
+                        const speed = SHOOTING_STAR_CONFIG.speed[0] +
+                            Math.random() * (SHOOTING_STAR_CONFIG.speed[1] - SHOOTING_STAR_CONFIG.speed[0]);
+                        const angle = startFromLeft
+                            ? (Math.PI / 6 + Math.random() * Math.PI / 6) // 30-60 degrees down-right
+                            : (Math.PI - Math.PI / 6 - Math.random() * Math.PI / 6); // 120-150 degrees down-left
+
+                        return {
+                            x: startFromLeft ? -20 : width + 20,
+                            y: height * (SHOOTING_STAR_CONFIG.startY[0] +
+                                Math.random() * (SHOOTING_STAR_CONFIG.startY[1] - SHOOTING_STAR_CONFIG.startY[0])),
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            length: SHOOTING_STAR_CONFIG.length[0] +
+                                Math.random() * (SHOOTING_STAR_CONFIG.length[1] - SHOOTING_STAR_CONFIG.length[0]),
+                            opacity: 0.8 + Math.random() * 0.2,
+                            trail: [],
+                            life: 1
+                        };
+                    }
 
                     // Generate city skyline
                     let cityPath = null;
@@ -417,6 +452,29 @@
                                 sparks.splice(i, 1);
                             }
                         }
+
+                        // Update shooting stars
+                        // if (Math.random() < SHOOTING_STAR_CONFIG.spawnChance &&
+                        //     shootingStars.length < SHOOTING_STAR_CONFIG.maxActive) {
+                        //     shootingStars.push(createShootingStar());
+                        // }
+
+                        // for (let i = shootingStars.length - 1; i >= 0; i--) {
+                        //     const ss = shootingStars[i];
+                        //     ss.trail.unshift({ x: ss.x, y: ss.y });
+                        //     if (ss.trail.length > 20) ss.trail.pop();
+
+                        //     ss.x += ss.vx * dt;
+                        //     ss.y += ss.vy * dt;
+                        //     ss.life -= 0.008 * dt;
+
+                        //     // Remove if off screen or faded
+                        //     if (ss.x < -50 || ss.x > width + 50 ||
+                        //         ss.y < -50 || ss.y > height * 0.6 ||
+                        //         ss.life <= 0) {
+                        //         shootingStars.splice(i, 1);
+                        //     }
+                        // }
                     }
 
                     function draw() {
@@ -439,6 +497,44 @@
                             ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
                             ctx.fill();
                         }
+
+                        // Draw shooting stars
+                        // for (const ss of shootingStars) {
+                        //     if (ss.trail.length < 2) continue;
+
+                        //     // Draw the glowing trail
+                        //     const gradient = ctx.createLinearGradient(
+                        //         ss.x, ss.y,
+                        //         ss.trail[ss.trail.length - 1].x,
+                        //         ss.trail[ss.trail.length - 1].y
+                        //     );
+                        //     gradient.addColorStop(0, `rgba(255, 255, 255, ${ss.opacity * ss.life})`);
+                        //     gradient.addColorStop(0.3, `rgba(200, 220, 255, ${ss.opacity * ss.life * 0.6})`);
+                        //     gradient.addColorStop(1, 'rgba(150, 180, 255, 0)');
+
+                        //     ctx.beginPath();
+                        //     ctx.moveTo(ss.x, ss.y);
+                        //     for (let i = 0; i < ss.trail.length; i++) {
+                        //         const t = ss.trail[i];
+                        //         ctx.lineTo(t.x, t.y);
+                        //     }
+                        //     ctx.strokeStyle = gradient;
+                        //     ctx.lineWidth = 2;
+                        //     ctx.lineCap = 'round';
+                        //     ctx.stroke();
+
+                        //     // Draw bright head
+                        //     ctx.beginPath();
+                        //     ctx.arc(ss.x, ss.y, 2, 0, Math.PI * 2);
+                        //     ctx.fillStyle = `rgba(255, 255, 255, ${ss.opacity * ss.life})`;
+                        //     ctx.fill();
+
+                        //     // Glow effect around head
+                        //     ctx.beginPath();
+                        //     ctx.arc(ss.x, ss.y, 4, 0, Math.PI * 2);
+                        //     ctx.fillStyle = `rgba(200, 220, 255, ${ss.opacity * ss.life * 0.3})`;
+                        //     ctx.fill();
+                        // }
 
                         // Draw city silhouette
                         if (cityPath) {
