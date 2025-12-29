@@ -40,8 +40,8 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const canvas = document.createElement('canvas');
                 canvas.id = 'effect-canvas';
-                // For iOS: use svh (small viewport height) which is stable regardless of toolbar state
-                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;height:100svh;pointer-events:none;z-index:-1;-webkit-backface-visibility:hidden;backface-visibility:hidden;';
+                // For iOS: use lvh (large viewport height) - the max viewport size, stays constant
+                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;height:100lvh;pointer-events:none;z-index:-1;-webkit-backface-visibility:hidden;backface-visibility:hidden;';
                 document.body.appendChild(canvas);
 
                 const ctx = canvas.getContext('2d');
