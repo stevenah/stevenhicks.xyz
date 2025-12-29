@@ -20,7 +20,7 @@
             const now = new Date();
             const month = now.getMonth();
             const day = now.getDate();
-            
+
             const isAutumn = month === 8 || month === 10;
             const isHalloween = month === 9;
             const isDecember = month === 11;
@@ -42,7 +42,7 @@
                 canvas.style.position = 'fixed';
                 canvas.style.top = '0';
                 canvas.style.left = '0';
-                canvas.style.pointerEvents = 'none';
+                canvas.style.pointerEvents = 'auto';
                 canvas.style.zIndex = '-1';
                 document.body.appendChild(canvas);
 
@@ -208,6 +208,15 @@
                             });
                         }
                     }
+
+                    // Click to create explosion at cursor position
+                    canvas.addEventListener('click', function (e) {
+                        const rect = canvas.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        const colorSet = colors[Math.floor(Math.random() * colors.length)];
+                        explode({ x, y, vx: 0, vy: 0, colorSet });
+                    });
 
                     let lastLaunch = 0;
 
