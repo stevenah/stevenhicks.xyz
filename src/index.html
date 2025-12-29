@@ -83,7 +83,6 @@
                         water: true,           // Water reflection below city
                         fireworks: true,       // Firework rockets and explosions
                         clickExplosions: true, // Click to create explosions
-                        buildingSpacing: 5,    // Space between buildings
                     };
 
                     // Fireworks for New Year's Eve and Day
@@ -119,7 +118,10 @@
                         twinkleChance: 0.3,
 
                         // Trail fade (lower = longer persistence)
-                        trailFade: 0.18
+                        trailFade: 0.18,
+
+                        // Building spacing
+                        buildingSpacing: 5
                     };
 
                     const fireworks = [];
@@ -254,7 +256,7 @@
                             // Building right side
                             cityPath.lineTo(x + buildingWidth, baseY);
 
-                            x += buildingWidth + FEATURES.buildingSpacing;
+                            x += buildingWidth + CONFIG.buildingSpacing;
                         }
 
                         cityPath.lineTo(width, baseY);
