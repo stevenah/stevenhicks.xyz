@@ -24,8 +24,7 @@
             const isAutumn = month === 8 || month === 10;
             const isHalloween = month === 9;
             const isDecember = month === 11;
-            // const isNewYear = (month === 11 && day === 31) || (month === 0 && day === 1);
-            const isNewYear = true;
+            const isNewYear = (month === 11 && day === 31) || (month === 0 && day === 1);
 
             if (!isDecember && !isNewYear && !isAutumn && !isHalloween) return;
 
