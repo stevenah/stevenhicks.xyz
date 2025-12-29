@@ -24,7 +24,8 @@
             const isAutumn = month === 8 || month === 10;
             const isHalloween = month === 9;
             const isDecember = month === 11;
-            const isNewYear = (month === 11 && day === 31) || (month === 0 && day === 1);
+            // const isNewYear = (month === 11 && day === 31) || (month === 0 && day === 1);
+            const isNewYear = true;
 
             if (!isDecember && !isNewYear && !isAutumn && !isHalloween) return;
 
@@ -114,6 +115,114 @@
                         ['#ff00ff', '#ff66ff', '#ffaaff'],
                         ['#ffd700', '#ffe44d', '#ffee99']
                     ];
+
+                    // Generate city skyline
+                    let cityPath = null;
+                    let buildings = [];
+                    function generateCity() {
+                        cityPath = new Path2D();
+                        buildings = [];
+                        const baseY = height * 0.85;
+                        let x = 0;
+
+                        cityPath.moveTo(0, height);
+                        cityPath.lineTo(0, baseY);
+
+                        while (x < width + 100) {
+                            const buildingWidth = 30 + Math.random() * 60;
+                            const buildingHeight = 50 + Math.random() * 200;
+                            const buildingTop = baseY - buildingHeight;
+
+                            // Store building data for windows
+                            buildings.push({
+                                x: x,
+                                y: buildingTop,
+                                width: buildingWidth,
+                                height: buildingHeight
+                            });
+
+                            // Building left side
+                            cityPath.lineTo(x, baseY);
+                            cityPath.lineTo(x, buildingTop);
+
+                            // Roof variations
+                            const roofType = Math.random();
+                            if (roofType < 0.3) {
+                                // Flat roof with antenna
+                                cityPath.lineTo(x + buildingWidth * 0.4, buildingTop);
+                                cityPath.lineTo(x + buildingWidth * 0.4, buildingTop - 15);
+                                cityPath.lineTo(x + buildingWidth * 0.45, buildingTop - 15);
+                                cityPath.lineTo(x + buildingWidth * 0.45, buildingTop - 30);
+                                cityPath.lineTo(x + buildingWidth * 0.5, buildingTop - 30);
+                                cityPath.lineTo(x + buildingWidth * 0.5, buildingTop - 15);
+                                cityPath.lineTo(x + buildingWidth * 0.55, buildingTop - 15);
+                                cityPath.lineTo(x + buildingWidth * 0.55, buildingTop);
+                                cityPath.lineTo(x + buildingWidth, buildingTop);
+                            } else if (roofType < 0.5) {
+                                // Pointed roof
+                                cityPath.lineTo(x + buildingWidth * 0.5, buildingTop - 25);
+                                cityPath.lineTo(x + buildingWidth, buildingTop);
+                            } else if (roofType < 0.7) {
+                                // Stepped roof
+                                cityPath.lineTo(x + buildingWidth * 0.3, buildingTop);
+                                cityPath.lineTo(x + buildingWidth * 0.3, buildingTop - 20);
+                                cityPath.lineTo(x + buildingWidth * 0.7, buildingTop - 20);
+                                cityPath.lineTo(x + buildingWidth * 0.7, buildingTop);
+                                cityPath.lineTo(x + buildingWidth, buildingTop);
+                            } else {
+                                // Flat roof
+                                cityPath.lineTo(x + buildingWidth, buildingTop);
+                            }
+
+                            // Building right side
+                            cityPath.lineTo(x + buildingWidth, baseY);
+
+                            x += buildingWidth + Math.random() * 5;
+                        }
+
+                        cityPath.lineTo(width, baseY);
+                        cityPath.lineTo(width, height);
+                        cityPath.closePath();
+
+                        // Generate windows for each building
+                        for (const b of buildings) {
+                            b.windows = [];
+                            const windowWidth = 4;
+                            const windowHeight = 6;
+                            const spacingX = 8;
+                            const spacingY = 12;
+                            const marginX = 6;
+                            const marginY = 10;
+
+                            const cols = Math.floor((b.width - marginX * 2) / spacingX);
+                            const rows = Math.floor((b.height - marginY * 2) / spacingY);
+
+                            for (let row = 0; row < rows; row++) {
+                                for (let col = 0; col < cols; col++) {
+                                    // ~60% chance window is lit
+                                    if (Math.random() < 0.6) {
+                                        b.windows.push({
+                                            x: b.x + marginX + col * spacingX,
+                                            y: b.y + marginY + row * spacingY,
+                                            w: windowWidth,
+                                            h: windowHeight,
+                                            // Warm yellow/orange tint
+                                            color: Math.random() < 0.8
+                                                ? `rgba(255, ${200 + Math.random() * 55}, ${100 + Math.random() * 50}, ${0.7 + Math.random() * 0.3})`
+                                                : `rgba(200, 220, 255, ${0.5 + Math.random() * 0.3})` // Some cool blue lights
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    generateCity();
+
+                    // Regenerate city on resize
+                    const originalResize = window.onresize;
+                    window.addEventListener('resize', function() {
+                        setTimeout(generateCity, 10);
+                    });
 
                     function randRange(arr) {
                         return arr[0] + Math.random() * (arr[1] - arr[0]);
@@ -292,6 +401,20 @@
                     function draw() {
                         ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
                         ctx.fillRect(0, 0, width, height);
+
+                        // Draw city silhouette
+                        if (cityPath) {
+                            ctx.fillStyle = '#0a0a12';
+                            ctx.fill(cityPath);
+
+                            // Draw windows
+                            for (const b of buildings) {
+                                for (const w of b.windows) {
+                                    ctx.fillStyle = w.color;
+                                    ctx.fillRect(w.x, w.y, w.w, w.h);
+                                }
+                            }
+                        }
 
                         // Draw firework trails
                         for (const f of fireworks) {
