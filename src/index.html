@@ -40,7 +40,8 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const canvas = document.createElement('canvas');
                 canvas.id = 'effect-canvas';
-                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;height:100dvh;pointer-events:none;z-index:-1;touch-action:none;';
+                // For iOS: use -webkit-overflow-scrolling and backface-visibility to prevent jitter
+                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:-1;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000;perspective:1000;will-change:transform;';
                 document.body.appendChild(canvas);
 
                 const ctx = canvas.getContext('2d');
@@ -48,41 +49,33 @@
 
                 let width, height;
                 // Store initial dimensions to avoid jitter from mobile address bar
-                let initialHeight = null;
+                let initialWidth = window.innerWidth;
+                let initialHeight = window.innerHeight;
 
-                function resizeCanvas(force) {
+                function resizeCanvas() {
                     const newWidth = window.innerWidth;
-                    // On mobile, use the initial height to prevent jitter from address bar show/hide
-                    // Only update height on significant changes (orientation change) or initial load
-                    const currentHeight = window.innerHeight;
+                    const newHeight = window.innerHeight;
 
-                    if (initialHeight === null) {
-                        // First load - capture the initial height
-                        initialHeight = currentHeight;
+                    // Only resize if width changed (orientation) or height changed significantly (>150px)
+                    // Small height changes are just the mobile address bar
+                    const widthChanged = Math.abs(newWidth - initialWidth) > 50;
+                    const heightChangedSignificantly = Math.abs(newHeight - initialHeight) > 150;
+
+                    if (widthChanged || heightChangedSignificantly) {
+                        initialWidth = newWidth;
+                        initialHeight = newHeight;
                     }
 
-                    // Detect orientation change or significant resize (>100px difference suggests orientation change)
-                    const isOrientationChange = Math.abs(newWidth - width) > 100 || force === true;
-
-                    if (isOrientationChange) {
-                        initialHeight = currentHeight;
-                    }
-
-                    width = newWidth;
-                    // Use the stable initial height to prevent address bar jitter
-                    height = Math.max(initialHeight, currentHeight);
+                    width = initialWidth;
+                    height = initialHeight;
 
                     canvas.width = width * DPR;
                     canvas.height = height * DPR;
-                    canvas.style.width = width + 'px';
-                    canvas.style.height = height + 'px';
                     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
                 }
 
-                window.addEventListener('resize', function() { resizeCanvas(false); });
-                // Don't listen to visualViewport resize - this causes jitter on mobile
-                // The address bar show/hide shouldn't resize our canvas
-                resizeCanvas(true);
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
 
                 if (isNewYear) {
                     // ==========================================
