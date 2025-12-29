@@ -47,13 +47,31 @@
                 const DPR = window.devicePixelRatio || 1;
 
                 let width, height;
+                // Store initial dimensions to avoid jitter from mobile address bar
+                let initialHeight = null;
 
-                function resizeCanvas() {
-                    width = window.innerWidth;
-                    // Use the larger of innerHeight and documentElement.clientHeight to cover mobile viewports
-                    // Also account for dvh where supported by using a CSS custom property
-                    const dvhHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-                    height = Math.max(window.innerHeight, dvhHeight, document.documentElement.clientHeight);
+                function resizeCanvas(force) {
+                    const newWidth = window.innerWidth;
+                    // On mobile, use the initial height to prevent jitter from address bar show/hide
+                    // Only update height on significant changes (orientation change) or initial load
+                    const currentHeight = window.innerHeight;
+
+                    if (initialHeight === null) {
+                        // First load - capture the initial height
+                        initialHeight = currentHeight;
+                    }
+
+                    // Detect orientation change or significant resize (>100px difference suggests orientation change)
+                    const isOrientationChange = Math.abs(newWidth - width) > 100 || force === true;
+
+                    if (isOrientationChange) {
+                        initialHeight = currentHeight;
+                    }
+
+                    width = newWidth;
+                    // Use the stable initial height to prevent address bar jitter
+                    height = Math.max(initialHeight, currentHeight);
+
                     canvas.width = width * DPR;
                     canvas.height = height * DPR;
                     canvas.style.width = width + 'px';
@@ -61,12 +79,10 @@
                     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
                 }
 
-                window.addEventListener('resize', resizeCanvas);
-                // Handle mobile viewport changes (address bar show/hide)
-                if (window.visualViewport) {
-                    window.visualViewport.addEventListener('resize', resizeCanvas);
-                }
-                resizeCanvas();
+                window.addEventListener('resize', function() { resizeCanvas(false); });
+                // Don't listen to visualViewport resize - this causes jitter on mobile
+                // The address bar show/hide shouldn't resize our canvas
+                resizeCanvas(true);
 
                 if (isNewYear) {
                     // ==========================================
@@ -291,12 +307,17 @@
                     }
                     generateCity();
 
-                    // Regenerate city and stars on resize
+                    // Regenerate city and stars on resize (only for significant changes like orientation)
+                    let lastCityWidth = width;
                     window.addEventListener('resize', function() {
-                        setTimeout(function() {
-                            generateCity();
-                            generateStars();
-                        }, 10);
+                        // Only regenerate if width changed significantly (orientation change)
+                        if (Math.abs(window.innerWidth - lastCityWidth) > 100) {
+                            lastCityWidth = window.innerWidth;
+                            setTimeout(function() {
+                                generateCity();
+                                generateStars();
+                            }, 10);
+                        }
                     });
 
                     function randRange(arr) {
