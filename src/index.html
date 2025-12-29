@@ -33,7 +33,7 @@
                 document.documentElement.classList.add('december');
             }
 
-            if (isHalloween) {
+            if (isHalloween) {  
                 document.documentElement.classList.add('halloween');
             }
 
@@ -115,6 +115,25 @@
                         ['#ff00ff', '#ff66ff', '#ffaaff'],
                         ['#ffd700', '#ffe44d', '#ffee99']
                     ];
+
+                    // Generate stars
+                    let stars = [];
+                    const STAR_COUNT = 150;
+
+                    function generateStars() {
+                        stars = [];
+                        for (let i = 0; i < STAR_COUNT; i++) {
+                            stars.push({
+                                x: Math.random() * width,
+                                y: Math.random() * height * 0.6, // Only in upper 60% of sky
+                                radius: Math.random() * 1.5 + 0.5,
+                                twinkleSpeed: 1 + Math.random() * 3,
+                                twinklePhase: Math.random() * Math.PI * 2,
+                                baseOpacity: 0.3 + Math.random() * 0.7
+                            });
+                        }
+                    }
+                    generateStars();
 
                     // Generate city skyline
                     let cityPath = null;
@@ -218,10 +237,12 @@
                     }
                     generateCity();
 
-                    // Regenerate city on resize
-                    const originalResize = window.onresize;
+                    // Regenerate city and stars on resize
                     window.addEventListener('resize', function() {
-                        setTimeout(generateCity, 10);
+                        setTimeout(function() {
+                            generateCity();
+                            generateStars();
+                        }, 10);
                     });
 
                     function randRange(arr) {
@@ -404,21 +425,31 @@
                         // Draw dusk sky gradient
                         const skyGradient = ctx.createLinearGradient(0, 0, 0, height);
                         skyGradient.addColorStop(0, '#0a0a14');
-                        skyGradient.addColorStop(0.5, '#1a1428');
-                        skyGradient.addColorStop(0.8, '#2d1f3d');
-                        skyGradient.addColorStop(1, '#3d2952');
+                        skyGradient.addColorStop(0.5, '#0a0a14');
                         ctx.fillStyle = skyGradient;
                         ctx.fillRect(0, 0, width, height);
+
+                        // Draw twinkling stars
+                        const starTime = performance.now();
+                        for (const star of stars) {
+                            const twinkle = 0.5 + 0.5 * Math.sin(starTime * star.twinkleSpeed / 1000 + star.twinklePhase);
+                            const opacity = star.baseOpacity * twinkle;
+                            ctx.beginPath();
+                            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                            ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                            ctx.fill();
+                        }
 
                         // Draw city silhouette
                         if (cityPath) {
                             // Draw city glow (ambient light pollution)
-                            const glowGradient = ctx.createLinearGradient(0, height * 0.5, 0, height);
+                            const waterY = height * 0.75;
+                            const glowGradient = ctx.createLinearGradient(0, height * 0.4, 0, waterY);
                             glowGradient.addColorStop(0, 'rgba(40, 30, 50, 0)');
-                            glowGradient.addColorStop(0.6, 'rgba(60, 40, 70, 0.3)');
-                            glowGradient.addColorStop(1, 'rgba(80, 50, 90, 0.5)');
+                            glowGradient.addColorStop(0.5, 'rgba(60, 40, 70, 0.3)');
+                            glowGradient.addColorStop(1, 'rgba(80, 50, 90, 0.4)');
                             ctx.fillStyle = glowGradient;
-                            ctx.fillRect(0, height * 0.5, width, height * 0.5);
+                            // ctx.fillRect(0, height * 0.4, width, waterY - height * 0.4);
 
                             // Building silhouette with slight highlight
                             ctx.fillStyle = '#12121a';
@@ -431,6 +462,32 @@
                                     ctx.fillRect(w.x, w.y, w.w, w.h);
                                 }
                             }
+
+                            // Draw water
+                            const waterGradient = ctx.createLinearGradient(0, waterY, 0, height);
+                            waterGradient.addColorStop(0, '#0a1520');
+                            waterGradient.addColorStop(0.3, '#0d1a28');
+                            waterGradient.addColorStop(1, '#061018');
+                            ctx.fillStyle = waterGradient;
+                            ctx.fillRect(0, waterY, width, height - waterY);
+
+                            // Draw building reflections in water
+                            ctx.save();
+                            ctx.translate(0, waterY * 2);
+                            ctx.scale(1, -1);
+                            ctx.globalAlpha = 0.3;
+                            ctx.fillStyle = '#0a0a10';
+                            ctx.fill(cityPath);
+
+                            // Reflected windows (dimmer)
+                            ctx.globalAlpha = 0.15;
+                            for (const b of buildings) {
+                                for (const w of b.windows) {
+                                    ctx.fillStyle = w.color;
+                                    ctx.fillRect(w.x, w.y, w.w, w.h);
+                                }
+                            }
+                            ctx.restore();
                         }
 
                         // Draw firework trails
