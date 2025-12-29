@@ -31,6 +31,15 @@ html.december {
 	background-color: var(--background-color);
 }
 
+html.halloween body {
+	background-color: transparent;
+}
+
+html.halloween {
+	background: linear-gradient(180deg, #1a0a2e 0%, #2d1b4e 30%, #4a2c5a 60%, #3d1f3f 100%);
+	min-height: 100%;
+}
+
 /* Falling Snow Canvas (December only) */
 #snow-canvas {
 	position: fixed;
