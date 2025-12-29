@@ -122,7 +122,7 @@
                     function generateCity() {
                         cityPath = new Path2D();
                         buildings = [];
-                        const baseY = height * 0.85;
+                        const baseY = height * 0.75;
                         let x = 0;
 
                         cityPath.moveTo(0, height);
@@ -399,12 +399,29 @@
                     }
 
                     function draw() {
-                        ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+                        ctx.clearRect(0, 0, width, height);
+
+                        // Draw dusk sky gradient
+                        const skyGradient = ctx.createLinearGradient(0, 0, 0, height);
+                        skyGradient.addColorStop(0, '#0a0a14');
+                        skyGradient.addColorStop(0.5, '#1a1428');
+                        skyGradient.addColorStop(0.8, '#2d1f3d');
+                        skyGradient.addColorStop(1, '#3d2952');
+                        ctx.fillStyle = skyGradient;
                         ctx.fillRect(0, 0, width, height);
 
                         // Draw city silhouette
                         if (cityPath) {
-                            ctx.fillStyle = '#0a0a12';
+                            // Draw city glow (ambient light pollution)
+                            const glowGradient = ctx.createLinearGradient(0, height * 0.5, 0, height);
+                            glowGradient.addColorStop(0, 'rgba(40, 30, 50, 0)');
+                            glowGradient.addColorStop(0.6, 'rgba(60, 40, 70, 0.3)');
+                            glowGradient.addColorStop(1, 'rgba(80, 50, 90, 0.5)');
+                            ctx.fillStyle = glowGradient;
+                            ctx.fillRect(0, height * 0.5, width, height * 0.5);
+
+                            // Building silhouette with slight highlight
+                            ctx.fillStyle = '#12121a';
                             ctx.fill(cityPath);
 
                             // Draw windows
