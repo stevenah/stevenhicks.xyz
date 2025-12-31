@@ -1,3 +1,4 @@
-User-agent: * 
-    Sitemap: https://www.stevenhicks.xyz/
-    Sitemap: https://www.stevenhicks.xyz/resume.pdf
+User-agent: *
+Allow: /
+
+Sitemap: https://www.stevenhicks.xyz/sitemap.xml
