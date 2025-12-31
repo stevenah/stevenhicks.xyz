@@ -16,9 +16,9 @@ $(DIST_DIR)/%.html: $(SRC_DIR)/%.html | $(DIST_DIR)
 		content=$$(<"${SRC_DIR}/$${line}" sed -e 's/&/\\&/g' -e 's/\//\\\//g' | tr -d '\n'); \
 		sed -i "s|<!-- $${line} -->|$${content}|g" "$@"; \
 	done
-	@minified_css=$$(go run github.com/tdewolff/minify/v2/cmd/minify@latest --css < ./src/style.css | sed -e 's/&/\\&/g' -e 's/\//\\\//g'); \
-	sed -i "s|<link rel=\"stylesheet\" type=\"text/css\" href=\"./style.css\" />|<style>$${minified_css}</style>|g" "$@"
-	go run github.com/tdewolff/minify/v2/cmd/minify@latest --html < "$@" > "$@.min" && mv "$@.min" "$@"
+	@go run github.com/tdewolff/minify/v2/cmd/minify@latest -o /tmp/minified.css ./src/style.css; \
+	perl -i -pe 'BEGIN{open F,"/tmp/minified.css";$$c=<F>;close F}s|<link rel="stylesheet" type="text/css" href="./style.css" />|<style>$$c</style>|' "$@"
+	go run github.com/tdewolff/minify/v2/cmd/minify@latest -o "$@.min" "$@" && mv "$@.min" "$@"
 
 copy-public: $(DIST_DIR)
 	cp -r $(PUBLIC_DIR)/* $(DIST_DIR)/
